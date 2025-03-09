@@ -186,19 +186,11 @@ function Library:Dialog(options)
     options.Content = options.Content or "This is a dialog box."
     options.Buttons = options.Buttons or { { Title = "OK", Callback = function() end } }
     local dialogGui = createInstance("ScreenGui", { Name = "DialogGui", Parent = CoreGui, ZIndexBehavior = Enum.ZIndexBehavior.Sibling })
-    local dialogFrame = createInstance("Frame", {
-        Name = "DialogFrame",
-        BackgroundColor3 = Library.CurrentTheme.Primary,
-        BorderSizePixel = 0,
-        Position = UDim2.new(0.5, 0, 0.5, 0),
-        AnchorPoint = Vector2.new(0.5, 0.5),
-        Size = UDim2.new(0, 400, 0, 200),
-        Parent = dialogGui
-    })
+    local dialogFrame = createInstance("Frame", { ... }) -- Created earlier
     shadowEffect(dialogFrame, 15, 0.3)
     createInstance("UICorner", { CornerRadius = UDim.new(0, 8), Parent = dialogFrame })
     createInstance("TextLabel", {
-        Name = "DialogTitle",
+        Name = "NotificationText",
         BackgroundTransparency = 1,
         Size = UDim2.new(1, -20, 0, 40),
         Position = UDim2.new(0, 10, 0, 5),
@@ -210,7 +202,7 @@ function Library:Dialog(options)
             TextYAlignment = Enum.TextYAlignment.Top,
             Font = Enum.Font.Gotham,
             TextTransparency = 0.3,
-            Parent = notification
+            Parent = dialogFrame
         })
     end
     createTween(notification, TweenInfoNotification, { Position = UDim2.new(0, 0, 0, 0) })
