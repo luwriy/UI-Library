@@ -1,5 +1,4 @@
--- RobloxFluentUI - A Modern UI Library for Roblox
--- Version 1.0.0
+-- Blue UI [Beta]
 
 local Library = {
     Version = "1.0.0",
@@ -27,15 +26,14 @@ local Library = {
     }
 }
 
--- Lucide Icons from https://lucide.dev/icons
 local Icons = {
-    settings = "rbxassetid://10723407389",
-    close = "rbxassetid://10723407085",
-    minimize = "rbxassetid://10723406885",
-    restore = "rbxassetid://10723406783",
-    check = "rbxassetid://10723368542",
-    dropdown = "rbxassetid://10723368866",
-    colorpicker = "rbxassetid://10723368996",
+    settings = "rbxassetid://9081489991",
+    close = "rbxassetid://385868190",
+    minimize = "rbxassetid://11358908031",
+    restore = "rbxassetid://11358908031",
+    check = "rbxassetid://3307607022",
+    dropdown = "rbxassetid://6372550470",
+    colorpicker = "rbxassetid://18308100808",
     slider = "rbxassetid://10723368203",
     search = "rbxassetid://10723406597",
     refresh = "rbxassetid://10723406416",
@@ -43,7 +41,6 @@ local Icons = {
     alert = "rbxassetid://10723369915"
 }
 
--- Services
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
@@ -52,7 +49,6 @@ local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local TextService = game:GetService("TextService")
 
--- Variables
 local Player = Players.LocalPlayer
 local Mouse = Player:GetMouse()
 local Viewport = workspace.CurrentCamera.ViewportSize
@@ -60,22 +56,17 @@ local TweenInfo_Hover = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDir
 local TweenInfo_Click = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 local TweenInfo_Notification = TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
 
--- Utility Functions
 local function CreateInstance(instanceType, properties)
-    -- Ensure instanceType is valid
     if not instanceType or type(instanceType) ~= "string" then
         warn("Invalid instanceType provided to CreateInstance.")
         return nil
     end
 
-    -- Create the instance
     local instance = Instance.new(instanceType)
 
-    -- Apply properties to the instance
     if properties and type(properties) == "table" then
         for property, value in pairs(properties) do
             if property ~= "Parent" then
-                -- Check if the property exists on the instance
                 if instance[property] ~= nil then
                     instance[property] = value
                 else
@@ -84,13 +75,21 @@ local function CreateInstance(instanceType, properties)
             end
         end
 
-        -- Set the parent last to avoid issues
         if properties.Parent then
             instance.Parent = properties.Parent
         end
     end
 
     return instance
+end
+
+local function isMouseOver(frame)
+    local mouse = Player:GetMouse()
+    local framePos = frame.AbsolutePosition
+    local frameSize = frame.AbsoluteSize
+    local mousePos = Vector2.new(mouse.X, mouse.Y)
+    return mousePos.X >= framePos.X and mousePos.X <= framePos.X + frameSize.X
+        and mousePos.Y >= framePos.Y and mousePos.Y <= framePos.Y + frameSize.Y
 end
 
 local function CreateTween(object, info, properties)
@@ -202,7 +201,6 @@ local function SelectTab(tabName, Window, currentTheme)
     Window.ActiveTab = tabName
 end
 
--- Dialog Constructor
 function Library:Dialog(options)
     options = options or {}
     options.Title = options.Title or "Dialog"
@@ -302,7 +300,6 @@ function Library:Dialog(options)
             Parent = Button
         })
 
-        -- Define ButtonTitle here
         local ButtonTitle = CreateInstance("TextLabel", {
             Name = "ButtonTitle",
             BackgroundTransparency = 1,
@@ -315,7 +312,6 @@ function Library:Dialog(options)
             Parent = Button
         })
 
-        -- Now use ButtonTitle in ApplyHoverEffect
         ApplyHoverEffect(
             Button,
             i == 1 and Library.CurrentTheme.Accent or Library.CurrentTheme.Secondary,
@@ -1016,7 +1012,7 @@ function Library:CreateWindow(options)
                     Name = "Button",
                     BackgroundColor3 = Library.CurrentTheme.Tertiary,
                     BorderSizePixel = 0,
-                    Size = UDim2.new(1, -20, 0, 36),
+                    Size = UDim2.new(1, 0, 0, 36),
                     Text = "",
                     Parent = SectionContent
                 })
@@ -1702,25 +1698,24 @@ function Library:CreateWindow(options)
                 ColorSlider.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 then
                         UpdateColorFromSlider(input.Position.X)
+                        input.Used = true -- Prevent event from bubbling to parent
                     end
                 end)
 
                 UserInputService.InputChanged:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseMovement and input.UserInputState == Enum.UserInputState.Change then
-                        if ColorSlider:IsMouseOver() then
+                        if isMouseOver(ColorSlider) then
                             UpdateColorFromSlider(input.Position.X)
                         end
                     end
                 end)
 
-                -- Toggle color picker when clicked
                 ColorPicker.InputBegan:Connect(function(input)
                     if input.UserInputType == Enum.UserInputType.MouseButton1 then
                         ToggleColorPicker()
                     end
                 end)
 
-                -- Color Picker hover effects
                 ApplyHoverEffect(
                     ColorPicker,
                     Library.CurrentTheme.Tertiary,
@@ -1743,15 +1738,12 @@ function Library:CreateWindow(options)
                 return ColorPickerObj
             end
 
-            -- Return Section Object
             return SectionObj
         end
 
-        -- Return Tab Object
         return TabObj
     end
 
-    -- Window Functions
     function Window:SelectTab(tabName)
         SelectTab(tabName, Window.Tabs, Library.CurrentTheme)
     end
@@ -1764,5 +1756,4 @@ function Library:CreateWindow(options)
     return Window
 end
 
--- Return Library
 return Library
